@@ -314,6 +314,37 @@
             overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
+            position: relative;
+        }
+        
+        #close-modal, #close-instructions {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #2e7d32;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            line-height: 36px;
+            text-align: center;
+            border-radius: 50%;
+            background: #f0f0f0;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        #close-modal:hover, #close-instructions:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+            background: #e8f5e9;
+        }
+        
+        #close-modal:active, #close-instructions:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .reward-message {
@@ -384,48 +415,149 @@
             .game-container {
                 padding: 10px;
                 margin: 10px;
-                height: auto;
+                height: 100vh;
+                max-height: none;
+            }
+
+            .header {
+                margin-bottom: 5px;
+                padding: 5px;
+            }
+
+            .timer {
+                font-size: 1.5em;
+                padding: 5px 15px;
+            }
+
+            .game-zones {
+                gap: 8px;
+                margin: 5px 0 50px 0;
+                height: calc(100vh - 160px);
+                max-height: none;
+            }
+
+            .zone {
+                min-height: 140px;
+                max-height: none;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+
+            .zone h2 {
+                font-size: 1.2em;
+                margin-bottom: 3px;
             }
 
             .zone-content {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                min-height: 120px;
+                padding: 5px;
+                gap: 8px;
             }
 
             .item {
-                min-height: 120px;
+                flex: 0 0 100px;
+                width: 100px;
+                height: 100px;
+                padding: 4px;
             }
 
             .item img {
-                width: 80px;
-                height: 80px;
+                width: 60px;
+                height: 60px;
+            }
+
+            .item .name {
+                font-size: 11px;
+                margin-top: 2px;
             }
 
             .controls {
-                flex-direction: row;
-                padding: 10px;
+                bottom: 10px;
+                padding: 5px;
             }
 
             button {
-                padding: 10px 20px;
+                padding: 8px 16px;
                 font-size: 1em;
+            }
+
+            .modal-content {
+                max-width: 90%;
+                padding: 20px;
+            }
+
+            .reward-message {
+                font-size: 20px;
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .reward-title {
+                font-size: 24px;
+            }
+
+            .reward-detail {
+                font-size: 18px;
+            }
+
+            .fact-popup {
+                font-size: 14px;
+                padding: 10px 20px;
+                max-width: 90%;
             }
         }
 
-        @media (max-height: 800px) {
+        /* iPad Portrait Specific */
+        @media only screen 
+        and (min-device-width: 768px) 
+        and (max-device-width: 1024px) 
+        and (orientation: portrait) {
             .game-container {
-                height: calc(100vh - 80px);
-                margin: 5px auto;
+                height: 100vh;
+                margin: 0;
+                padding: 15px;
             }
 
             .game-zones {
                 height: calc(100vh - 180px);
-                max-height: calc(100vh - 180px);
             }
 
             .zone {
-                min-height: 100px;
-                max-height: calc((100vh - 250px) / 3);
+                min-height: 160px;
             }
+
+            .item {
+                flex: 0 0 110px;
+                width: 110px;
+                height: 110px;
+            }
+
+            .item img {
+                width: 70px;
+                height: 70px;
+            }
+
+            .welcome-title {
+                font-size: 3em;
+            }
+
+            .welcome-content {
+                width: 90%;
+                padding: 1.5rem;
+            }
+
+            .start-button {
+                padding: 15px 40px;
+                font-size: 1.3em;
+            }
+        }
+
+        /* Prevent bounce scrolling on iOS */
+        html, body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         /* Remove sound button styles */
@@ -440,175 +572,81 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(240, 255, 240, 0.97) 100%);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-
-        .welcome-interface::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom,
-                rgba(0, 100, 0, 0.1) 0%,
-                rgba(0, 100, 0, 0.1) 50%,
-                rgba(139, 0, 0, 0.1) 50%,
-                rgba(139, 0, 0, 0.1) 100%);
-            background: url('./images/Game-background.png') center/cover;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        .welcome-interface.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
+            z-index: 1000;
         }
 
         .welcome-content {
             text-align: center;
+            background: white;
             padding: 2rem;
-            background: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(0);
-            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             width: 80%;
-            max-width: 800px;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .welcome-content:hover {
-            transform: translateY(-5px);
+        .welcome-logo {
+            width: 200px;
+            height: auto;
+            margin: 0 auto 10px;
         }
 
         .welcome-title {
-            font-size: 4em;
-            font-weight: 800;
-            margin-bottom: 10px;
-            text-shadow: 3px 3px 0px rgba(76, 175, 80, 0.2);
-            animation: fadeInDown 1s ease, float 3s ease-in-out infinite;
-            background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
+            font-size: 2.5em;
+            color: #2e7d32;
+            margin: 0;
+            line-height: 1.2;
         }
 
-        .welcome-subtitle {
-            font-size: 2em;
-            color: #4caf50;
-            margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            animation: fadeInUp 1s ease;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+        .welcome-content p {
+            font-size: 1.2em;
+            color: #333;
+            margin: 10px 0;
         }
 
         .start-button {
-            padding: 20px 50px;
-            font-size: 1.5em;
-            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            background: #4caf50;
             color: white;
             border: none;
-            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: pulse 2s infinite;
-            position: relative;
-            overflow: hidden;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .start-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transition: 0.5s;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 0 #2e7d32;
         }
 
         .start-button:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .start-button:hover::before {
-            left: 100%;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #2e7d32;
         }
 
         .start-button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 0 #2e7d32;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hidden {
+            display: none;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        #instructions-modal {
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 2000 !important;
         }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            }
-        }
-
-        .welcome-logo {
-            max-width: 300px;
-            height: auto;
-            margin-bottom: 20px;
+        
+        /* Add this to ensure the modal works in all browsers */
+        #instructions-modal.active {
+            display: flex !important;
         }
     </style>
 </head>
@@ -618,7 +656,7 @@
             <img src="./images/Earthya-logo.png" alt="Earthya Logo" class="welcome-logo">
             <h1 class="welcome-title">Welcome to Break It Down!</h1>
             <p>Learn about decomposition times and help sort items correctly!</p>
-            <button class="start-button" id="start-game">Start Game</button>
+            <button class="start-button" id="start-game" onclick="document.querySelector('.welcome-interface').style.display = 'none'; var modal = document.getElementById('instructions-modal'); modal.style.display = 'flex'; modal.classList.add('active');">Start Game</button>
         </div>
     </div>
     <div class="game-container">
@@ -643,17 +681,32 @@
             </div>
         </div>
 
-        <div class="controls">
+        <div class="controls" id="game-controls" style="display: none;">
             <button id="check-answers">Check Answers</button>
             <button id="new-game">New Game</button>
         </div>
 
         <div id="results-modal" class="modal">
             <div class="modal-content">
-                <span id="close-modal">&times;</span>
+                <span id="close-modal" onclick="document.getElementById('results-modal').style.display = 'none'; document.querySelector('.welcome-interface').style.display = 'flex';">&times;</span>
                 <div id="score"></div>
-                <div id="decomposition-times"></div>
                 <div id="earthya-comparison"></div>
+                <div id="decomposition-times"></div>
+            </div>
+        </div>
+        
+        <div id="instructions-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-instructions" onclick="document.getElementById('instructions-modal').style.display = 'none'; if(window.gameInstance) window.gameInstance.initGame();">&times;</span>
+                <h2 style="color: #2e7d32; text-align: center; margin-bottom: 20px;">How to Play? 🎮</h2>
+                <ul style="list-style: none; padding: 0; font-size: 1.2em; line-height: 1.8;">
+                    <li>• 👆 Tap an item to select it</li>
+                    <li>• ♻️ Tap Safe Zone or Harmful Zone to place it</li>
+                    <li>• ⏱️ You have 60 seconds to sort all items</li>
+                    <li>• 🎁 Score 60% for a PACK of Earthya Bags</li>
+                    <li>• 🏆 Score 90% for a ROLL of Earthya Bags</li>
+                </ul>
+                <button id="got-it" class="button" onclick="document.getElementById('instructions-modal').style.display = 'none'; if(window.gameInstance) window.gameInstance.initGame();" style="display: block; margin: 20px auto; padding: 10px 20px; font-size: 1.2em; background-color: #2e7d32; color: white; border: none; border-radius: 5px; cursor: pointer;">Got it!</button>
             </div>
         </div>
     </div>
@@ -695,67 +748,77 @@
                 this.lastTimestamp = null;
                 this.score = 0;
                 this.setupEventListeners();
-                this.setupWelcomeInterface();
-            }
-
-            setupWelcomeInterface() {
-                const welcomeInterface = document.getElementById('welcome-interface');
-                const startButton = document.getElementById('start-game');
-                
-                startButton.addEventListener('click', () => {
-                    welcomeInterface.classList.add('hidden');
-                    this.initializeGame();
-                });
-            }
-
-            initializeGame() {
-                this.stopTimer();
-                this.timeLeft = 60;
-                document.getElementById('time').textContent = this.timeLeft;
-                this.clearAllZones();
-                this.shuffleAndDisplayItems();
-                this.startTimer();
             }
 
             setupEventListeners() {
+                const container = document.querySelector('.game-container');
+                
+                // Event delegation for all game interactions
+                container.addEventListener('click', (e) => {
+                    const item = e.target.closest('.item');
+                    const zone = e.target.closest('.zone');
+                    
+                    // If clicked on an item
+                    if (item) {
+                        this.handleItemClick(item);
+                    } 
+                    // If clicked on a zone and there's a selected item
+                    else if (zone && this.selectedItem) {
+                        this.handleZoneClick(zone);
+                    }
+                });
+                
+                // Game control buttons
                 document.getElementById('check-answers').addEventListener('click', () => this.checkAnswers());
                 document.getElementById('new-game').addEventListener('click', () => this.resetGame());
+                
+                // Start button on welcome screen
+                document.querySelector('.start-button').addEventListener('click', () => this.startGame());
+                
+                // Close button for results modal
                 document.getElementById('close-modal').addEventListener('click', () => {
-                    this.closeModal();
-                    document.getElementById('welcome-interface').classList.remove('hidden');
+                    document.getElementById('results-modal').style.display = 'none';
+                    document.querySelector('.welcome-interface').style.display = 'flex';
                 });
-
-                document.getElementById('start-game').addEventListener('click', () => {
-                    document.getElementById('welcome-interface').classList.add('hidden');
-                    this.initializeGame();
+                
+                // Instructions modal controls
+                document.getElementById('close-instructions').addEventListener('click', () => {
+                    document.getElementById('instructions-modal').style.display = 'none';
+                    this.initGame();
                 });
-
-                const zones = ['safe-zone', 'harmful-zone', 'unsorted-zone'];
-                zones.forEach(zoneId => {
-                    const zone = document.getElementById(zoneId);
-                    
-                    zone.addEventListener('click', (e) => {
-                        const clickedItem = e.target.closest('.item');
-                        if (clickedItem) {
-                            this.handleItemClick(clickedItem);
-                        } else if (this.selectedItem && zoneId !== 'unsorted-zone') {
-                            const targetZone = zoneId.split('-')[0];
-                            this.moveItem(this.selectedItem, targetZone);
-                        }
-                    });
+                
+                document.getElementById('got-it').addEventListener('click', () => {
+                    document.getElementById('instructions-modal').style.display = 'none';
+                    this.initGame();
                 });
             }
 
-            handleItemClick(itemElement) {
-                if (this.selectedItem === itemElement) {
-                    itemElement.classList.remove('selected');
+            handleItemClick(item) {
+                // If there's already a selected item, deselect it first
+                if (this.selectedItem) {
+                    this.selectedItem.classList.remove('selected');
+                }
+                
+                // If clicking the same item, just deselect it
+                if (this.selectedItem === item) {
                     this.selectedItem = null;
-                } else {
-                    if (this.selectedItem) {
-                        this.selectedItem.classList.remove('selected');
-                    }
-                    this.selectedItem = itemElement;
-                    itemElement.classList.add('selected');
+                    return;
+                }
+                
+                // Select the new item
+                this.selectedItem = item;
+                item.classList.add('selected');
+            }
+            
+            handleZoneClick(zone) {
+                if (!this.selectedItem) return;
+                
+                const zoneId = zone.id;
+                const targetZone = zoneId.split('-')[0];
+                
+                // Only allow moving to safe or harmful zones
+                if (targetZone !== 'unsorted') {
+                    this.moveItem(this.selectedItem, targetZone);
                 }
             }
 
@@ -826,7 +889,7 @@
                 if (score >= 90) {
                     rewardMessage = `
                         <div class="reward-message">
-                            <div class="reward-title">🎉 Congratulations! 🎉</div>
+                            <div class="reward-title">🎉 CONGRATULATIONS! 🎉</div>
                             <div class="reward-detail">
                                 You've earned a ROLL of Earthya Compostable Bags!<br>
                                 Outstanding performance in protecting our environment!
@@ -848,20 +911,59 @@
                 // Insert reward message after score
                 scoreElement.innerHTML += rewardMessage;
                 
-                decompositionTimes.innerHTML = '<h3>Decomposition Times:</h3>';
-                [...gameItems.safe, ...gameItems.harmful].forEach(item => {
-                    decompositionTimes.innerHTML += `<p>${item.name}: ${item.time}</p>`;
-                });
-
                 const earthyaBag = gameItems.safe.find(item => item.name === "Earthya Compostable Bag");
                 const plasticBag = gameItems.harmful.find(item => item.name === "Plastic Bag");
                 
                 earthyaComparison.innerHTML = `
-                    <h3>Earthya vs Plastic Bag</h3>
-                    <p>Earthya Compostable Bag: ${earthyaBag.time}</p>
-                    <p>Plastic Bag: ${plasticBag.time}</p>
-                    <p>That's a difference of ${this.calculateTimeDifference(earthyaBag.time, plasticBag.time)}!</p>
+                    <h2 style="font-size: 2em; color: #2e7d32; margin: 20px 0;">Earthya vs Plastic Bag</h2>
+                    <p style="font-size: 1.4em; margin: 10px 0;">
+                        Earthya Compostable Bag: ${earthyaBag.time}<br>
+                        Plastic Bag: ${plasticBag.time}
+                    </p>
                 `;
+                
+                // Find incorrect answers
+                let incorrectItems = [];
+                document.querySelectorAll('.item').forEach(item => {
+                    const currentZone = item.parentElement.parentElement.id.split('-')[0];
+                    if (currentZone !== item.dataset.category && currentZone !== 'unsorted') {
+                        const itemName = item.querySelector('.name').textContent;
+                        const correctCategory = item.dataset.category;
+                        const itemData = [...gameItems.safe, ...gameItems.harmful].find(i => i.name === itemName);
+                        
+                        incorrectItems.push({
+                            name: itemName,
+                            current: currentZone,
+                            correct: correctCategory,
+                            time: itemData.time,
+                            fact: itemData.fact
+                        });
+                    }
+                });
+                
+                decompositionTimes.innerHTML = '<h2 style="font-size: 2em; color: #2e7d32; margin: 20px 0;">Your Mistakes:</h2>';
+                
+                if (incorrectItems.length === 0) {
+                    decompositionTimes.innerHTML += `
+                        <p style="font-size: 1.2em; color: #2e7d32; font-weight: bold;">
+                            Perfect! You sorted all items correctly.
+                        </p>
+                    `;
+                } else {
+                    incorrectItems.forEach(item => {
+                        const correctZoneText = item.correct === 'safe' ? 'Safe Zone' : 'Harmful Zone';
+                        const correctColor = item.correct === 'safe' ? '#4caf50' : '#f44336';
+                        
+                        decompositionTimes.innerHTML += `
+                            <div style="margin: 15px 0; padding: 10px; border-left: 4px solid ${correctColor}; background: #f9f9f9; text-align: left;">
+                                <p style="font-weight: bold; font-size: 1.2em; margin-bottom: 5px;">${item.name} (${item.time})</p>
+                                <p>You placed it in: <span style="color: #f44336; font-weight: bold;">${item.current === 'safe' ? 'Safe Zone' : 'Harmful Zone'}</span></p>
+                                <p>Correct zone: <span style="color: ${correctColor}; font-weight: bold;">${correctZoneText}</span></p>
+                                <p style="margin-top: 8px;"><strong>Why:</strong> ${item.fact}</p>
+                            </div>
+                        `;
+                    });
+                }
 
                 modal.style.display = 'flex';
             }
@@ -884,7 +986,7 @@
                 this.timeLeft = 60;
                 document.getElementById('time').textContent = this.timeLeft;
                 this.clearAllZones();
-                document.getElementById('welcome-interface').classList.remove('hidden');
+                document.querySelector('.welcome-interface').style.display = 'flex';
             }
 
             shuffleAndDisplayItems() {
@@ -972,10 +1074,68 @@
                 }
                 return array;
             }
+
+            startGame() {
+                document.querySelector('.welcome-interface').style.display = 'none';
+                const instructionsModal = document.getElementById('instructions-modal');
+                instructionsModal.style.display = 'flex';
+                instructionsModal.style.opacity = '1';
+                instructionsModal.style.visibility = 'visible';
+                instructionsModal.style.zIndex = '2000';
+            }
+            
+            initGame() {
+                this.stopTimer();
+                this.timeLeft = 60;
+                document.getElementById('time').textContent = this.timeLeft;
+                this.clearAllZones();
+                this.shuffleAndDisplayItems();
+                this.startTimer();
+            }
         }
 
         window.addEventListener('load', () => {
-            new Game();
+            // Store the game instance globally so our extra initialization code can access it
+            window.gameInstance = new Game();
+        });
+    </script>
+    <!-- Auto-initialization script to ensure modals work on copied code -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Make sure modals are properly initialized
+            const startButton = document.querySelector('.start-button');
+            const instructionsModal = document.getElementById('instructions-modal');
+            const gotItButton = document.getElementById('got-it');
+            const closeInstructionsButton = document.getElementById('close-instructions');
+            
+            if (startButton) {
+                startButton.onclick = function() {
+                    document.querySelector('.welcome-interface').style.display = 'none';
+                    instructionsModal.style.display = 'flex';
+                };
+            }
+            
+            if (gotItButton) {
+                gotItButton.onclick = function() {
+                    instructionsModal.style.display = 'none';
+                    // Initialize game
+                    const game = window.gameInstance;
+                    if (game) {
+                        game.initGame();
+                    }
+                };
+            }
+            
+            if (closeInstructionsButton) {
+                closeInstructionsButton.onclick = function() {
+                    instructionsModal.style.display = 'none';
+                    // Initialize game
+                    const game = window.gameInstance;
+                    if (game) {
+                        game.initGame();
+                    }
+                };
+            }
         });
     </script>
 </body>
