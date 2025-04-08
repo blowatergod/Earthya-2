@@ -98,6 +98,8 @@
             overflow-y: auto;
             padding: 5px;
             height: calc(100vh - 120px);
+            position: relative;
+            z-index: 1;
         }
 
         .zone {
@@ -177,10 +179,43 @@
             height: 100%;
             opacity: 0;
             transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .game-interface::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom,
+                rgba(0, 100, 0, 0.1) 0%,
+                rgba(0, 100, 0, 0.1) 50%,
+                rgba(139, 0, 0, 0.1) 50%,
+                rgba(139, 0, 0, 0.1) 100%);
+            background: url('./images/Game-background.png') center/cover;
+            opacity: 0.1;
+            z-index: -1;
         }
 
         .game-interface.visible {
             opacity: 1;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            border-radius: 10px;
+            color: white;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .welcome-interface {
@@ -512,7 +547,7 @@
         }
 
         .welcome-logo {
-            max-width: 200px;
+            max-width: 300px;
             height: auto;
             margin-bottom: 20px;
         }
@@ -1015,14 +1050,14 @@
 </head>
 <body>
     <div class="game-container">
-        <div class="welcome-interface" id="welcome-interface">
-            <div class="welcome-content">
-                <img src="./images/Earthya-logo.png" alt="Earthya Logo" class="welcome-logo">
+    <div class="welcome-interface" id="welcome-interface">
+        <div class="welcome-content">
+            <img src="./images/Earthya-logo.png" alt="Earthya Logo" class="welcome-logo">
                 <h1 class="welcome-title">Break It Down!</h1>
                 <p class="welcome-subtitle">Learn about decomposition and environmental impact</p>
-                <button class="start-button" id="start-game">Start Game</button>
-            </div>
+            <button class="start-button" id="start-game">Start Game</button>
         </div>
+    </div>
 
         <div id="instructions-modal" class="modal">
             <div class="modal-content instructions-content">
@@ -1085,24 +1120,24 @@
         <div class="game-interface">
             <div class="game-header">
                 <div class="timer" id="timer">Time: <span id="time">60</span>s</div>
+        </div>
+
+        <div class="game-zones">
+            <div class="zone safe-zone" id="safe-zone">
+                <h2>Safe Zone</h2>
+                <div class="zone-content"></div>
             </div>
 
-            <div class="game-zones">
-                <div class="zone safe-zone" id="safe-zone">
-                    <h2>Safe Zone</h2>
-                    <div class="zone-content"></div>
-                </div>
-
-                <div class="zone unsorted-zone" id="unsorted-zone">
-                    <h2>Sort Items Here</h2>
-                    <div class="zone-content"></div>
-                </div>
-
-                <div class="zone harmful-zone" id="harmful-zone">
-                    <h2>Harmful Zone</h2>
-                    <div class="zone-content"></div>
-                </div>
+            <div class="zone unsorted-zone" id="unsorted-zone">
+                <h2>Sort Items Here</h2>
+                <div class="zone-content"></div>
             </div>
+
+            <div class="zone harmful-zone" id="harmful-zone">
+                <h2>Harmful Zone</h2>
+                <div class="zone-content"></div>
+            </div>
+        </div>
         </div>
 
         <div id="results-modal" class="modal">
@@ -1214,13 +1249,13 @@
                         }
                         
                         // Toggle selection of the clicked item
-                        if (this.selectedItem === itemElement) {
-                            itemElement.classList.remove('selected');
-                            this.selectedItem = null;
-                        } else {
-                            this.selectedItem = itemElement;
-                            itemElement.classList.add('selected');
-                        }
+                if (this.selectedItem === itemElement) {
+                    itemElement.classList.remove('selected');
+                    this.selectedItem = null;
+                } else {
+                    this.selectedItem = itemElement;
+                    itemElement.classList.add('selected');
+                }
                     }
                 });
             }
@@ -1518,31 +1553,6 @@
                     const itemElement = this.createItemElement(item);
                     unsortedZone.appendChild(itemElement);
                 });
-
-                // Show instructions during gameplay
-                const gameInstructions = document.createElement('div');
-                gameInstructions.className = 'instructions gameplay-instructions';
-                gameInstructions.innerHTML = `
-                    <h3>How to Play:</h3>
-                    <ul>
-                        <li>Click an item to select it</li>
-                        <li>Click a zone (Safe or Harmful) to move the selected item there</li>
-                        <li>Sort all items before the timer runs out!</li>
-                    </ul>
-                `;
-                
-                // Remove existing gameplay instructions if any
-                const existingInstructions = document.querySelector('.gameplay-instructions');
-                if (existingInstructions) {
-                    existingInstructions.remove();
-                }
-                
-                // Add new instructions
-                const gameInterface = document.querySelector('.game-interface');
-                gameInterface.insertBefore(
-                    gameInstructions,
-                    document.querySelector('.game-zones')
-                );
 
                 // Start the timer
                 this.startTimer();
