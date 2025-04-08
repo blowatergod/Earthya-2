@@ -904,6 +904,7 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             z-index: 1000;
             pointer-events: none;
+            transition: none !important; /* Disable transitions during drag */
         }
         
         .item img {
@@ -1157,11 +1158,13 @@
                     document.addEventListener('mousemove', this.handleDrag.bind(this));
                     document.addEventListener('mouseup', this.handleDragEnd.bind(this));
                     
-                    // Touch events
-                    item.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-                    document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-                    document.addEventListener('touchend', this.handleTouchEnd.bind(this));
+                    // Touch events - use capture phase to ensure we get the events first
+                    item.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false, capture: true });
                 });
+                
+                // Add document-level touch events
+                document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false, capture: true });
+                document.addEventListener('touchend', this.handleTouchEnd.bind(this), { capture: true });
 
                 // Add event listeners for zones
                 const zones = document.querySelectorAll('.zone');
@@ -1187,23 +1190,6 @@
                             this.checkAnswers();
                         }
                     });
-                    
-                    // Touch events for zones
-                    zone.addEventListener('touchmove', (e) => {
-                        e.preventDefault();
-                        zone.classList.add('drag-over');
-                    }, { passive: false });
-                    
-                    zone.addEventListener('touchend', (e) => {
-                        zone.classList.remove('drag-over');
-                        
-                        const draggedItem = document.querySelector('.dragging');
-                        if (draggedItem) {
-                            zone.appendChild(draggedItem);
-                            draggedItem.classList.remove('dragging');
-                            this.checkAnswers();
-                        }
-                    });
                 });
             }
 
@@ -1218,12 +1204,20 @@
                 
                 // Get the initial touch position
                 const touch = e.touches[0];
-                this.touchOffsetX = touch.clientX - item.getBoundingClientRect().left;
-                this.touchOffsetY = touch.clientY - item.getBoundingClientRect().top;
+                const rect = item.getBoundingClientRect();
+                
+                // Calculate the offset from the touch point to the item's top-left corner
+                this.touchOffsetX = touch.clientX - rect.left;
+                this.touchOffsetY = touch.clientY - rect.top;
                 
                 // Set initial position
-                item.style.position = 'absolute';
+                item.style.position = 'fixed';
                 item.style.zIndex = '1000';
+                item.style.width = `${rect.width}px`;
+                item.style.height = `${rect.height}px`;
+                item.style.pointerEvents = 'none';
+                
+                // Position the item at the touch point
                 this.updateItemPosition(touch.clientX, touch.clientY);
             }
             
@@ -1238,22 +1232,52 @@
             handleTouchEnd(e) {
                 if (!this.draggedItem) return;
                 
+                // Find the zone under the touch point
+                const touchX = e.changedTouches[0].clientX;
+                const touchY = e.changedTouches[0].clientY;
+                
+                const zones = ['safe-zone', 'harmful-zone', 'unsorted-zone'];
+                let targetZone = null;
+                
+                for (const zoneId of zones) {
+                    const zone = document.getElementById(zoneId);
+                    const rect = zone.getBoundingClientRect();
+                    
+                    if (touchX >= rect.left && touchX <= rect.right &&
+                        touchY >= rect.top && touchY <= rect.bottom) {
+                        targetZone = zoneId.split('-')[0];
+                        break;
+                    }
+                }
+                
+                // Reset styles
                 this.draggedItem.classList.remove('dragging');
                 this.draggedItem.style.position = '';
                 this.draggedItem.style.zIndex = '';
+                this.draggedItem.style.width = '';
+                this.draggedItem.style.height = '';
                 this.draggedItem.style.transform = '';
-                this.draggedItem = null;
+                this.draggedItem.style.pointerEvents = '';
                 
+                // Move the item to the target zone if found
+                if (targetZone) {
+                    this.moveItem(this.draggedItem, targetZone);
+                }
+                
+                this.draggedItem = null;
                 this.checkAnswers();
             }
             
             updateItemPosition(clientX, clientY) {
                 if (!this.draggedItem) return;
                 
+                // Calculate the position to place the item so the touch point remains at the same relative position
                 const x = clientX - this.touchOffsetX;
                 const y = clientY - this.touchOffsetY;
                 
-                this.draggedItem.style.transform = `translate(${x}px, ${y}px)`;
+                // Apply the position
+                this.draggedItem.style.left = `${x}px`;
+                this.draggedItem.style.top = `${y}px`;
             }
 
             handleItemClick(itemElement) {
