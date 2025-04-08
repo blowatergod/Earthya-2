@@ -184,24 +184,21 @@
         }
 
         .item {
-            flex: 0 0 130px;
+            width: 80px;
+            height: 80px;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 8px;
-            text-align: center;
-            cursor: move;
-            transition: all 0.3s ease;
+            border-radius: 10px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 130px;
-            height: 130px;
-            margin-right: 8px;
-            position: relative;
-            z-index: 2;
+            justify-content: center;
+            cursor: grab;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            touch-action: none; /* Prevent default touch actions */
+            -webkit-touch-callout: none; /* Prevent callout on iOS */
+            -webkit-user-select: none; /* Prevent text selection */
+            user-select: none;
+            will-change: transform; /* Optimize for animations */
         }
 
         /* Remove the previous grid-specific styles */
@@ -902,9 +899,18 @@
         }
 
         .item.dragging {
-            opacity: 0.5;
-            transform: scale(0.95);
+            opacity: 0.8;
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .item img {
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+            pointer-events: none; /* Prevent image from interfering with drag */
         }
 
         .zone-content.drag-over {
@@ -1126,22 +1132,16 @@
             }
 
             setupEventListeners() {
-                // Welcome screen start button
+                // Add event listeners for the start game button
                 document.getElementById('start-game').addEventListener('click', () => {
                     document.getElementById('welcome-interface').classList.add('hidden');
-                    document.getElementById('instructions-modal').style.display = 'flex';
-                });
-
-                // Close instructions button
-                document.getElementById('close-instructions').addEventListener('click', () => {
-                    document.getElementById('instructions-modal').style.display = 'none';
-                    document.getElementById('welcome-interface').classList.remove('hidden');
-                });
-
-                // Start game after instructions button
-                document.getElementById('start-game-after-instructions').addEventListener('click', () => {
-                    document.getElementById('instructions-modal').style.display = 'none';
                     this.initializeGame();
+                });
+
+                // Add event listener for the play again button
+                document.getElementById('play-again').addEventListener('click', () => {
+                    this.closeModal();
+                    document.getElementById('welcome-interface').classList.remove('hidden');
                 });
 
                 document.getElementById('close-modal').addEventListener('click', () => {
@@ -1149,49 +1149,111 @@
                     document.getElementById('welcome-interface').classList.remove('hidden');
                 });
 
-                document.getElementById('play-again').addEventListener('click', () => {
-                    this.closeModal();
-                    document.getElementById('welcome-interface').classList.remove('hidden');
+                // Add event listeners for sorting items
+                const items = document.querySelectorAll('.item');
+                items.forEach(item => {
+                    // Mouse events
+                    item.addEventListener('mousedown', this.handleDragStart.bind(this));
+                    document.addEventListener('mousemove', this.handleDrag.bind(this));
+                    document.addEventListener('mouseup', this.handleDragEnd.bind(this));
+                    
+                    // Touch events
+                    item.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+                    document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+                    document.addEventListener('touchend', this.handleTouchEnd.bind(this));
                 });
 
-                const zones = ['safe-zone', 'harmful-zone', 'unsorted-zone'];
-                zones.forEach(zoneId => {
-                    const zone = document.getElementById(zoneId);
-                    const zoneContent = zone.querySelector('.zone-content');
+                // Add event listeners for zones
+                const zones = document.querySelectorAll('.zone');
+                zones.forEach(zone => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
                     
-                    // Enhanced drop zone event listeners
-                    zoneContent.addEventListener('dragenter', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        zoneContent.classList.add('drag-over');
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
                     });
-
-                    zoneContent.addEventListener('dragover', (e) => {
+                    
+                    zone.addEventListener('drop', (e) => {
                         e.preventDefault();
-                        e.stopPropagation();
-                        zoneContent.classList.add('drag-over');
-                    });
-
-                    zoneContent.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!zoneContent.contains(e.relatedTarget)) {
-                            zoneContent.classList.remove('drag-over');
+                        zone.classList.remove('drag-over');
+                        
+                        const itemId = e.dataTransfer.getData('text/plain');
+                        const item = document.getElementById(itemId);
+                        
+                        if (item) {
+                            zone.appendChild(item);
+                            this.checkAnswers();
                         }
                     });
-
-                    zoneContent.addEventListener('drop', (e) => {
+                    
+                    // Touch events for zones
+                    zone.addEventListener('touchmove', (e) => {
                         e.preventDefault();
-                        e.stopPropagation();
-                        zoneContent.classList.remove('drag-over');
+                        zone.classList.add('drag-over');
+                    }, { passive: false });
+                    
+                    zone.addEventListener('touchend', (e) => {
+                        zone.classList.remove('drag-over');
                         
                         const draggedItem = document.querySelector('.dragging');
                         if (draggedItem) {
-                            const targetZone = zoneId.split('-')[0];
-                            this.moveItem(draggedItem, targetZone);
+                            zone.appendChild(draggedItem);
+                            draggedItem.classList.remove('dragging');
+                            this.checkAnswers();
                         }
                     });
                 });
+            }
+
+            // Touch event handlers
+            handleTouchStart(e) {
+                e.preventDefault();
+                const item = e.target.closest('.item');
+                if (!item) return;
+                
+                this.draggedItem = item;
+                item.classList.add('dragging');
+                
+                // Get the initial touch position
+                const touch = e.touches[0];
+                this.touchOffsetX = touch.clientX - item.getBoundingClientRect().left;
+                this.touchOffsetY = touch.clientY - item.getBoundingClientRect().top;
+                
+                // Set initial position
+                item.style.position = 'absolute';
+                item.style.zIndex = '1000';
+                this.updateItemPosition(touch.clientX, touch.clientY);
+            }
+            
+            handleTouchMove(e) {
+                e.preventDefault();
+                if (!this.draggedItem) return;
+                
+                const touch = e.touches[0];
+                this.updateItemPosition(touch.clientX, touch.clientY);
+            }
+            
+            handleTouchEnd(e) {
+                if (!this.draggedItem) return;
+                
+                this.draggedItem.classList.remove('dragging');
+                this.draggedItem.style.position = '';
+                this.draggedItem.style.zIndex = '';
+                this.draggedItem.style.transform = '';
+                this.draggedItem = null;
+                
+                this.checkAnswers();
+            }
+            
+            updateItemPosition(clientX, clientY) {
+                if (!this.draggedItem) return;
+                
+                const x = clientX - this.touchOffsetX;
+                const y = clientY - this.touchOffsetY;
+                
+                this.draggedItem.style.transform = `translate(${x}px, ${y}px)`;
             }
 
             handleItemClick(itemElement) {
