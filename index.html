@@ -50,17 +50,17 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 1024px;
+            max-width: 1200px;
             height: calc(100vh - 40px);
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 10px;
+            padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
-            margin: 10px auto;
-            overflow-y: auto;
+            margin: 20px auto;
+            overflow: hidden;
         }
 
         .header {
@@ -92,24 +92,23 @@
         .game-zones {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin: 5px 0 40px 0;
+            gap: 10px;
+            margin: 5px 0;
             flex: 1;
             overflow-y: auto;
             padding: 5px;
             height: calc(100vh - 120px);
-            max-height: calc(100vh - 120px);
         }
 
         .zone {
             border: 3px dashed #ccc;
             border-radius: 10px;
             padding: 12px;
-            min-height: 140px;
-            max-height: calc((100vh - 200px) / 3);
+            height: calc((100vh - 200px) / 3.5);
+            min-height: 160px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             position: relative;
             z-index: 1;
             cursor: pointer;
@@ -152,43 +151,89 @@
 
         .zone-content {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-items: center;
             gap: 15px;
             padding: 15px;
-            min-height: 120px;
-            max-height: calc((100vh - 220px) / 3);
+            min-height: 140px;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 8px;
-            overflow-y: auto;
+            overflow-x: auto;
+            overflow-y: hidden;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
 
-        .zone-content::-webkit-scrollbar {
-            height: 8px;
+        #unsorted-zone .zone-content {
+            min-height: 160px;
+            background: rgba(255, 255, 255, 0.9);
         }
 
-        .zone-content::-webkit-scrollbar-track {
-            background: transparent;
+        .game-interface {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .zone-content::-webkit-scrollbar-thumb {
-            background-color: #4caf50;
-            border-radius: 20px;
+        .game-interface.visible {
+            opacity: 1;
         }
 
-        /* Specific colors for different zones */
-        #safe-zone .zone-content::-webkit-scrollbar-thumb {
-            background-color: #4caf50;
+        .welcome-interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
         }
 
-        #harmful-zone .zone-content::-webkit-scrollbar-thumb {
-            background-color: #f44336;
+        .welcome-interface.hidden {
+            display: none;
+        }
+
+        .instructions {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h2 {
+            color: #2196f3;
+            margin-bottom: 15px;
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .instructions ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
         }
 
         .item {
+            flex: 0 0 auto;
             width: 120px;
             height: 120px;
             background-color: #f0f0f0;
@@ -199,7 +244,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin: 10px;
+            margin: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
             padding: 10px;
@@ -433,22 +478,6 @@
         }
 
         /* Welcome Interface Styles */
-        .welcome-interface {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(240, 255, 240, 0.97) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-
         .welcome-interface::before {
             content: '';
             position: absolute;
@@ -464,12 +493,6 @@
             background: url('./images/Game-background.png') center/cover;
             opacity: 0.1;
             z-index: -1;
-        }
-
-        .welcome-interface.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
         }
 
         .welcome-content {
@@ -991,92 +1014,94 @@
     </style>
 </head>
 <body>
-    <div class="welcome-interface" id="welcome-interface">
-        <div class="welcome-content">
-            <img src="./images/Earthya-logo.png" alt="Earthya Logo" class="welcome-logo">
-            <h1 class="welcome-title">Break It Down!</h1>
-            <p class="welcome-subtitle">Learn about decomposition and environmental impact</p>
-            <button class="start-button" id="start-game">Start Game</button>
+    <div class="game-container">
+        <div class="welcome-interface" id="welcome-interface">
+            <div class="welcome-content">
+                <img src="./images/Earthya-logo.png" alt="Earthya Logo" class="welcome-logo">
+                <h1 class="welcome-title">Break It Down!</h1>
+                <p class="welcome-subtitle">Learn about decomposition and environmental impact</p>
+                <button class="start-button" id="start-game">Start Game</button>
+            </div>
         </div>
-    </div>
 
-    <div id="instructions-modal" class="modal">
-        <div class="modal-content instructions-content">
-            <span id="close-instructions">&times;</span>
-            <h2 class="instructions-title">How to Play</h2>
-            
-            <div class="game-instructions">
-                <div class="instruction-section">
-                    <h2 class="instruction-title">🎯 Game Objective</h2>
-                    <p class="instruction-text">
-                        This game is about understanding what happens to different items when they end up in landfills. 
-                        Your task is to sort items based on their environmental impact when discarded.
-                    </p>
-                </div>
+        <div id="instructions-modal" class="modal">
+            <div class="modal-content instructions-content">
+                <span id="close-instructions">&times;</span>
+                <h2 class="instructions-title">How to Play</h2>
+                
+                <div class="game-instructions">
+                    <div class="instruction-section">
+                        <h2 class="instruction-title">🎯 Game Objective</h2>
+                        <p class="instruction-text">
+                            This game is about understanding what happens to different items when they end up in landfills. 
+                            Your task is to sort items based on their environmental impact when discarded.
+                        </p>
+                    </div>
 
-                <div class="instruction-section">
-                    <h2 class="instruction-title">🌍 Understanding the Zones</h2>
-                    <div class="zone-example">
-                        <div class="zone-example-item safe-example">
-                            <div class="example-title">Safe Zone</div>
-                            <div class="example-description">
-                                Items that decompose naturally and safely return to the environment without releasing harmful toxins
+                    <div class="instruction-section">
+                        <h2 class="instruction-title">🌍 Understanding the Zones</h2>
+                        <div class="zone-example">
+                            <div class="zone-example-item safe-example">
+                                <div class="example-title">Safe Zone</div>
+                                <div class="example-description">
+                                    Items that decompose naturally and safely return to the environment without releasing harmful toxins
+                                </div>
                             </div>
-                        </div>
-                        <div class="zone-example-item harmful-example">
-                            <div class="example-title">Harmful Zone</div>
-                            <div class="example-description">
-                                Items that release toxins or take extremely long to decompose, causing environmental harm
+                            <div class="zone-example-item harmful-example">
+                                <div class="example-title">Harmful Zone</div>
+                                <div class="example-description">
+                                    Items that release toxins or take extremely long to decompose, causing environmental harm
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="instruction-section">
+                        <h2 class="instruction-title">🎮 How to Play</h2>
+                        <ul class="instruction-list">
+                            <li>Tap an item in the unsorted zone to select it</li>
+                            <li>Tap a zone (Safe or Harmful) to move the selected item there</li>
+                            <li>You have 60 seconds to sort all items correctly</li>
+                            <li>Items in the Safe zone decompose naturally and safely</li>
+                            <li>Items in the Harmful zone release toxins or take centuries to decompose</li>
+                            <li>Get immediate feedback with facts about each item when sorted correctly</li>
+                        </ul>
+                    </div>
+
+                    <div class="instruction-section">
+                        <h2 class="instruction-title">🏆 Scoring</h2>
+                        <ul class="instruction-list">
+                            <li>Score 60% or higher to earn a ROLL of Earthya Compostable Bags</li>
+                            <li>Score below 60% to earn a PACK of Earthya Compostable Bags</li>
+                            <li>Learn from your mistakes with detailed explanations for incorrect placements</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="instruction-section">
-                    <h2 class="instruction-title">🎮 How to Play</h2>
-                    <ul class="instruction-list">
-                        <li>Tap an item in the unsorted zone to select it</li>
-                        <li>Tap a zone (Safe or Harmful) to move the selected item there</li>
-                        <li>You have 60 seconds to sort all items correctly</li>
-                        <li>Items in the Safe zone decompose naturally and safely</li>
-                        <li>Items in the Harmful zone release toxins or take centuries to decompose</li>
-                        <li>Get immediate feedback with facts about each item when sorted correctly</li>
-                    </ul>
-                </div>
-
-                <div class="instruction-section">
-                    <h2 class="instruction-title">🏆 Scoring</h2>
-                    <ul class="instruction-list">
-                        <li>Score 60% or higher to earn a ROLL of Earthya Compostable Bags</li>
-                        <li>Score below 60% to earn a PACK of Earthya Compostable Bags</li>
-                        <li>Learn from your mistakes with detailed explanations for incorrect placements</li>
-                    </ul>
-                </div>
+                <button class="start-game-button" id="start-game-after-instructions">Start Playing</button>
             </div>
-
-            <button class="start-game-button" id="start-game-after-instructions">Start Playing</button>
-        </div>
-    </div>
-
-    <div class="game-container">
-        <div class="header">
-            <div class="timer">Time: <span id="time">60</span>s</div>
         </div>
 
-        <div class="game-zones">
-            <div class="zone safe-zone" id="safe-zone">
-                <h2>Safe Zone</h2>
-                <div class="zone-content"></div>
+        <div class="game-interface">
+            <div class="game-header">
+                <div class="timer" id="timer">Time: <span id="time">60</span>s</div>
             </div>
 
-            <div class="zone unsorted-zone" id="unsorted-zone">
-                <h2>Sort Items Here</h2>
-                <div class="zone-content"></div>
-            </div>
+            <div class="game-zones">
+                <div class="zone safe-zone" id="safe-zone">
+                    <h2>Safe Zone</h2>
+                    <div class="zone-content"></div>
+                </div>
 
-            <div class="zone harmful-zone" id="harmful-zone">
-                <h2>Harmful Zone</h2>
-                <div class="zone-content"></div>
+                <div class="zone unsorted-zone" id="unsorted-zone">
+                    <h2>Sort Items Here</h2>
+                    <div class="zone-content"></div>
+                </div>
+
+                <div class="zone harmful-zone" id="harmful-zone">
+                    <h2>Harmful Zone</h2>
+                    <div class="zone-content"></div>
+                </div>
             </div>
         </div>
 
@@ -1150,6 +1175,17 @@
                 // Add event listener for the start game button
                 document.getElementById('start-game').addEventListener('click', () => {
                     document.getElementById('welcome-interface').classList.add('hidden');
+                    document.getElementById('instructions-modal').style.display = 'flex';
+                });
+
+                // Add event listener for the close instructions button
+                document.getElementById('close-instructions').addEventListener('click', () => {
+                    document.getElementById('instructions-modal').style.display = 'none';
+                });
+
+                // Add event listener for the start game after instructions button
+                document.getElementById('start-game-after-instructions').addEventListener('click', () => {
+                    document.getElementById('instructions-modal').style.display = 'none';
                     this.initializeGame();
                 });
 
@@ -1178,13 +1214,13 @@
                         }
                         
                         // Toggle selection of the clicked item
-                if (this.selectedItem === itemElement) {
-                    itemElement.classList.remove('selected');
-                    this.selectedItem = null;
-                } else {
-                    this.selectedItem = itemElement;
-                    itemElement.classList.add('selected');
-                }
+                        if (this.selectedItem === itemElement) {
+                            itemElement.classList.remove('selected');
+                            this.selectedItem = null;
+                        } else {
+                            this.selectedItem = itemElement;
+                            itemElement.classList.add('selected');
+                        }
                     }
                 });
             }
@@ -1380,7 +1416,7 @@
 
             shuffleAndDisplayItems() {
                 const allItems = [...gameItems.safe, ...gameItems.harmful];
-                const shuffledItems = this.shuffleArray(allItems);
+                const shuffledItems = this.shuffleArray([...allItems]);
                 const unsortedZone = document.querySelector('#unsorted-zone .zone-content');
                 unsortedZone.innerHTML = '';
 
@@ -1464,11 +1500,51 @@
             }
 
             initializeGame() {
-                this.stopTimer();
-                this.timeLeft = 60;
-                document.getElementById('time').textContent = this.timeLeft;
-                this.clearAllZones();
-                this.shuffleAndDisplayItems();
+                // Clear all zones
+                document.querySelectorAll('.zone-content').forEach(zone => {
+                    zone.innerHTML = '';
+                });
+
+                // Show game interface
+                document.querySelector('.game-interface').classList.add('visible');
+
+                // Create and shuffle items
+                const allItems = [...gameItems.safe, ...gameItems.harmful];
+                const shuffledItems = this.shuffleArray([...allItems]);
+
+                // Add items to unsorted zone
+                const unsortedZone = document.querySelector('#unsorted-zone .zone-content');
+                shuffledItems.forEach(item => {
+                    const itemElement = this.createItemElement(item);
+                    unsortedZone.appendChild(itemElement);
+                });
+
+                // Show instructions during gameplay
+                const gameInstructions = document.createElement('div');
+                gameInstructions.className = 'instructions gameplay-instructions';
+                gameInstructions.innerHTML = `
+                    <h3>How to Play:</h3>
+                    <ul>
+                        <li>Click an item to select it</li>
+                        <li>Click a zone (Safe or Harmful) to move the selected item there</li>
+                        <li>Sort all items before the timer runs out!</li>
+                    </ul>
+                `;
+                
+                // Remove existing gameplay instructions if any
+                const existingInstructions = document.querySelector('.gameplay-instructions');
+                if (existingInstructions) {
+                    existingInstructions.remove();
+                }
+                
+                // Add new instructions
+                const gameInterface = document.querySelector('.game-interface');
+                gameInterface.insertBefore(
+                    gameInstructions,
+                    document.querySelector('.game-zones')
+                );
+
+                // Start the timer
                 this.startTimer();
             }
         }
